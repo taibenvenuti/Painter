@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Language UniqueName="sv" ReadableName="Svenska" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Translations>
+    <Translation ID="PAINTER-DESCRIPTION" String="Ändra färgerna på byggnaderna när du spelar." />
+    <Translation ID="PAINTER-RESET" String="Radera" />
+    <Translation ID="PAINTER-COPY" String="Kopiera" />
+    <Translation ID="PAINTER-PASTE" String="Klistra" />
+  </Translations>
+</Language>
