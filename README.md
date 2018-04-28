@@ -1,2 +1,7 @@
 # Painter
-Change colors on individual buildings.
+
+A mod for Cities: Skylines city-building videogame.
+
+Lets you change building colors in-game.
+
+https://steamcommunity.com/sharedfiles/filedetails/?id=1372431101
