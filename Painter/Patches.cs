@@ -7,9 +7,9 @@ namespace Painter
     [HarmonyPatch(typeof(BuildingAI), "GetColor")]
     class BuildingAIPatch
     {
-        static void Postfix(ref Color __result, ushort buildingID)
+        static void Postfix(ref Color __result, ushort buildingID, InfoManager.InfoMode infoMode)
         {
-            if (Painter.instance.Colors.TryGetValue(buildingID, out SerializableColor color)) __result = color;
+            if (Painter.instance.Colors.TryGetValue(buildingID, out SerializableColor color) && infoMode == InfoManager.InfoMode.None) __result = color;
         }
     }
 

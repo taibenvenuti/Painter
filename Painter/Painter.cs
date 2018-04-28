@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,7 +33,18 @@ namespace Painter
         private string CopyText => UserMod.Translation.GetTranslation("PAINTER-COPY");
         private string PasteText => UserMod.Translation.GetTranslation("PAINTER-PASTE");
         private string ResetText => UserMod.Translation.GetTranslation("PAINTER-RESET");
-        
+                
+        private void Update()
+        {
+            if (!IsPanelVisible) return;
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.C))
+                copyPasteColor = GetColor();
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.V))
+                PasteColor();
+            if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
+                EraseColor();    
+        }
+
         internal Color GetColor()
         {
             var building = BuildingManager.instance.m_buildings.m_buffer[BuildingID];
@@ -54,15 +66,22 @@ namespace Painter
             BuildingManager.instance.UpdateBuildingColors(BuildingID);
         }
 
-        private void Update()
+        private void EraseColor()
         {
-            if (!IsPanelVisible) return;
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.C))
-                copyPasteColor = GetColor();
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.V))
-                PasteColor();
-            if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
-                ResetColor();            
+            var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
+            ResetColor();
+            field.selectedColor = GetColor();
+            field.SendMessage("ClosePopup", false);
+            field.SendMessage("OpenPopup");
+        }
+
+        private void PasteColor()
+        {
+            var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
+            UpdateColor(copyPasteColor, BuildingID);
+            field.selectedColor = copyPasteColor;
+            field.SendMessage("ClosePopup", false);
+            field.SendMessage("OpenPopup");
         }
 
         internal void AddColorFieldsToPanels()
@@ -149,22 +168,9 @@ namespace Painter
             };
             resetButton.eventClick += (c, e) =>
             {
-                var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
-                ResetColor();
-                field.selectedColor = GetColor();
-                field.SendMessage("ClosePopup", false);
-                field.SendMessage("OpenPopup");
+                EraseColor();
             };
-        }
-
-        private void PasteColor()
-        {
-            var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
-            UpdateColor(copyPasteColor, BuildingID);
-            field.selectedColor = copyPasteColor;
-            field.SendMessage("ClosePopup", false);
-            field.SendMessage("OpenPopup");
-        }
+        }        
     }
 
     public enum PanelType
