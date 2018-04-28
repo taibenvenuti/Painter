@@ -1,8 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace Painter
@@ -30,6 +28,7 @@ namespace Painter
         private UIButton pasteButton;
         private Color32 copyPasteColor;
         internal ushort BuildingID;
+        internal bool IsPanelVisible;
         private string CopyText => UserMod.Translation.GetTranslation("PAINTER-COPY");
         private string PasteText => UserMod.Translation.GetTranslation("PAINTER-PASTE");
         private string ResetText => UserMod.Translation.GetTranslation("PAINTER-RESET");
@@ -48,18 +47,25 @@ namespace Painter
             BuildingManager.instance.UpdateBuildingColors(currentBuilding);
         }
 
-        private void ResetColor(ushort currentBuilding)
+        private void ResetColor()
         {
-            if (Colors.TryGetValue(currentBuilding, out SerializableColor color))
-                Colors.Remove(currentBuilding);
-            BuildingManager.instance.UpdateBuildingColors(currentBuilding);
+            if (Colors.TryGetValue(BuildingID, out SerializableColor color))
+                Colors.Remove(BuildingID);
+            BuildingManager.instance.UpdateBuildingColors(BuildingID);
         }
 
         private void Update()
         {
-
+            if (!IsPanelVisible) return;
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.C))
+                copyPasteColor = GetColor();
+            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.V))
+                PasteColor();
+            if (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace))
+                ResetColor();            
         }
-        internal void AddPanelButtons()
+
+        internal void AddColorFieldsToPanels()
         {
             Panels = new Dictionary<PanelType, BuildingWorldInfoPanel>
             {
@@ -86,7 +92,7 @@ namespace Painter
                 if (colorFIeldTemplate == null) return null;
             }
 
-            UIColorField cF = Object.Instantiate(colorFIeldTemplate.gameObject).GetComponent<UIColorField>();
+            UIColorField cF = Instantiate(colorFIeldTemplate.gameObject).GetComponent<UIColorField>();
             parent.AttachUIComponent(cF.gameObject);
             cF.name = "PainterColorField";
             cF.AlignTo(parent, UIAlignAnchor.TopRight);
@@ -139,20 +145,25 @@ namespace Painter
             };
             pasteButton.eventClick += (c, e) =>
             {
-                var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
-                UpdateColor(copyPasteColor, BuildingID);
-                field.selectedColor = copyPasteColor;
-                field.SendMessage("ClosePopup", false);
-                field.SendMessage("OpenPopup");
+                PasteColor();
             };
             resetButton.eventClick += (c, e) =>
             {
                 var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
-                ResetColor(BuildingID);
+                ResetColor();
                 field.selectedColor = GetColor();
                 field.SendMessage("ClosePopup", false);
                 field.SendMessage("OpenPopup");
             };
+        }
+
+        private void PasteColor()
+        {
+            var field = Panels[PanelType.Service].component.isVisible ? ColorFields[PanelType.Service] : Panels[PanelType.Shelter].component.isVisible ? ColorFields[PanelType.Shelter] : ColorFields[PanelType.Zoned];
+            UpdateColor(copyPasteColor, BuildingID);
+            field.selectedColor = copyPasteColor;
+            field.SendMessage("ClosePopup", false);
+            field.SendMessage("OpenPopup");
         }
     }
 

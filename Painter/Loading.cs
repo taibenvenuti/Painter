@@ -21,7 +21,7 @@ namespace Painter
             {
                 if(LoadingManager.instance.m_loadingComplete)
                 {
-                    Painter.instance.AddPanelButtons();
+                    Painter.instance.AddColorFieldsToPanels();
                     SimulationManager.instance.AddAction(() => 
                     {
                         for (ushort i = 0; i < BuildingManager.instance.m_buildings.m_buffer.Length; i++)
