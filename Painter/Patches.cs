@@ -4,12 +4,17 @@ using UnityEngine;
 
 namespace Painter
 {
-    [HarmonyPatch(typeof(BuildingAI), "GetColor")]
-    class BuildingAIPatch
+    [HarmonyPatch(typeof(CommonBuildingAI), "GetColor")]
+    class CommonBuildingAIPatch
     {
-        static void Postfix(ref Color __result, ushort buildingID, InfoManager.InfoMode infoMode)
+        static bool Prefix(ref Color __result, ushort buildingID, InfoManager.InfoMode infoMode)
         {
-            if (Painter.instance.Colors.TryGetValue(buildingID, out SerializableColor color) && infoMode == InfoManager.InfoMode.None) __result = color;
+            if (Painter.instance.Colors.TryGetValue(buildingID, out SerializableColor color) && infoMode == InfoManager.InfoMode.None)
+            {
+                __result = color;
+                return false;
+            }
+            return true;
         }
     }
 
