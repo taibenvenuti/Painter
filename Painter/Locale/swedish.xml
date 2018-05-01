@@ -5,5 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Radera" />
     <Translation ID="PAINTER-COPY" String="Kopiera" />
     <Translation ID="PAINTER-PASTE" String="Klistra" />
+    <Translation ID="PAINTER-COLORIZE" String="Colorize" />
+    <Translation ID="PAINTER-INVERT" String="Invert" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-loading the save." />
   </Translations>
 </Language>

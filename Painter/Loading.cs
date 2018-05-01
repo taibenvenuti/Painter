@@ -1,4 +1,7 @@
-﻿using ICities;
+﻿using System.Linq;
+using ColossalFramework.Plugins;
+using ICities;
+using PrefabHook;
 
 namespace Painter
 {
@@ -11,6 +14,15 @@ namespace Painter
         {
             base.OnCreated(loading);
             mode = loading.currentMode;
+            if (!IsHooked() || loading.currentMode != AppMode.Game) return;
+            BuildingInfoHook.OnPreInitialization += OnPreBuildingInit;
+            BuildingInfoHook.Deploy();
+        }
+
+        public void OnPreBuildingInit(BuildingInfo prefab)
+        {
+            if(Painter.instance.Colorizer.Colorized.Contains(prefab.name)) Painter.instance.Colorize(prefab, false);
+            else if (Painter.instance.Colorizer.Inverted.Contains(prefab.name)) Painter.instance.Colorize(prefab, true);
         }
 
         public override void OnLevelLoaded(LoadMode loadMode)
@@ -33,6 +45,30 @@ namespace Painter
                     doneUpdate = true;
                 }
             }
+        }
+
+        public override void OnLevelUnloading()
+        {
+            base.OnLevelUnloading();
+        }
+
+        public override void OnReleased()
+        {
+            base.OnReleased();
+            if (!IsHooked()) return;
+            BuildingInfoHook.OnPreInitialization -= OnPreBuildingInit;
+            BuildingInfoHook.Revert();
+        }
+
+        public static bool IsHooked()
+        {
+            var plugins = PluginManager.instance.GetPluginsInfo();
+            return (from plugin in plugins.Where(p => p.isEnabled)
+                    select plugin.GetInstances<IUserMod>() into instances
+                    where instances.Any()
+                    select instances[0].Name into name
+                    where name == "Prefab Hook"
+                    select name).Any();
         }
     }
 }

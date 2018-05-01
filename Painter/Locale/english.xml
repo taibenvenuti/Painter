@@ -5,5 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Erase" />
     <Translation ID="PAINTER-COPY" String="Copy" />
     <Translation ID="PAINTER-PASTE" String="Paste" />
+    <Translation ID="PAINTER-COLORIZE" String="Colorize" />
+    <Translation ID="PAINTER-INVERT" String="Invert" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-loading the save." />
   </Translations>
 </Language>

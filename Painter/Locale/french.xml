@@ -5,5 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Effacer" />
     <Translation ID="PAINTER-COPY" String="Copier" />
     <Translation ID="PAINTER-PASTE" String="Coller" />
+    <Translation ID="PAINTER-COLORIZE" String="Repeindre" />
+    <Translation ID="PAINTER-INVERT" String="Inverser" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="Cette option nécessite un redémarrage du jeu." />
   </Translations>
 </Language>

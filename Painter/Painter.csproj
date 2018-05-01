@@ -60,6 +60,9 @@
       <HintPath>C:\Users\Tateihuari\Modding\ReferenceStore\ICities.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PrefabHook">
+      <HintPath>D:\Steam\steamapps\workshop\content\255710\530771650\PrefabHook.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>C:\Users\Tateihuari\Modding\ReferenceStore\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -70,12 +73,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XMLSerializer.cs" />
+    <Compile Include="TextureUtil.cs" />
     <Compile Include="ColorEntry.cs" />
     <Compile Include="Loading.cs" />
     <Compile Include="Painter.cs" />
     <Compile Include="Patches.cs" />
     <Compile Include="SerializableColor.cs" />
-    <Compile Include="SerializableData.cs" />
+    <Compile Include="SerializableDataExtension.cs" />
     <Compile Include="TranslationFramework\Language.cs" />
     <Compile Include="TranslationFramework\TranslatableAttribute.cs" />
     <Compile Include="TranslationFramework\Translation.cs" />

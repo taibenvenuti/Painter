@@ -1,5 +1,6 @@
 ﻿using ColossalFramework;
 using ColossalFramework.UI;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -26,22 +27,52 @@ namespace Painter
         private UIButton copyButton;
         private UIButton resetButton;
         private UIButton pasteButton;
+        private UICheckBox colorizeCheckbox;
+        private UICheckBox invertCheckbox;
         private Color32 copyPasteColor;
         internal ushort BuildingID;
-        internal bool IsPanelVisible;
+        internal BuildingInfo Building => BuildingManager.instance.m_buildings.m_buffer[BuildingID].Info;
         private string CopyText => UserMod.Translation.GetTranslation("PAINTER-COPY");
         private string PasteText => UserMod.Translation.GetTranslation("PAINTER-PASTE");
         private string ResetText => UserMod.Translation.GetTranslation("PAINTER-RESET");
-                
-        private void Update()
+        private string ColorizeText => UserMod.Translation.GetTranslation("PAINTER-COLORIZE");
+        private string InvertText => UserMod.Translation.GetTranslation("PAINTER-INVERT");
+        private string ReloadRequiredTooltip => UserMod.Translation.GetTranslation("PAINTER-RELOAD-REQUIRED");
+
+        internal PainterColorizer colorizer;
+        public PainterColorizer Colorizer
         {
-            if (!IsPanelVisible) return;
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.C))
-                copyPasteColor = GetColor();
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && Input.GetKeyDown(KeyCode.V))
-                PasteColor();
-            if ((Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || Input.GetKey(KeyCode.LeftCommand) || Input.GetKey(KeyCode.RightCommand)) && (Input.GetKeyDown(KeyCode.Delete) || Input.GetKeyDown(KeyCode.Backspace)))
-                EraseColor();    
+            get
+            {
+                if (colorizer == null)
+                {
+                    colorizer = PainterColorizer.Load();
+                    if (colorizer == null)
+                    {
+                        colorizer = new PainterColorizer();
+                        colorizer.Save();
+                    }
+                }
+                return colorizer;
+            }
+            set
+            {
+                colorizer = value;
+            }
+        }
+
+        private Dictionary<string, bool> madeColoredList;
+        internal Dictionary<string, bool> MadeColoredList
+        {
+            get
+            {
+                if (madeColoredList == null) madeColoredList = new Dictionary<string, bool>();
+                return madeColoredList;
+            }
+            set
+            {
+                madeColoredList = value;
+            }
         }
 
         internal Color GetColor()
@@ -82,6 +113,31 @@ namespace Painter
             field.SendMessage("ClosePopup", false);
             field.SendMessage("OpenPopup");
         }
+
+        internal void Colorize(BuildingInfo building, bool invert)
+        {
+            try
+            {
+                building.GetComponent<Renderer>().material.UpdateACI(invert);
+                building.m_lodObject.GetComponent<Renderer>().material.UpdateACI(invert);
+                foreach (var subBuilding in building.m_subMeshes)
+                {
+                    try
+                    {
+                        subBuilding.m_subInfo.GetComponent<Renderer>().material.UpdateACI(invert);
+                        subBuilding.m_subInfo.m_lodObject.GetComponent<Renderer>().material.UpdateACI(invert);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogWarning(ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(ex);
+            }
+        }     
 
         internal void AddColorFieldsToPanels()
         {
@@ -143,6 +199,36 @@ namespace Painter
             return button;
         }
 
+        public UICheckBox CreateCheckBox(UIComponent parent, string fieldName)
+        {
+            UICheckBox checkBox = parent.AddUIComponent<UICheckBox>();
+
+            checkBox.name = fieldName;
+            checkBox.width = 20f;
+            checkBox.height = 20f;
+            checkBox.relativePosition = Vector3.zero;
+
+            UILabel label = checkBox.AddUIComponent<UILabel>();
+            label.text = fieldName == "Colorize" ? ColorizeText : InvertText;
+            label.textScale = 0.8f;
+            label.relativePosition = new Vector3(22f, 5f);
+
+            UISprite sprite = checkBox.AddUIComponent<UISprite>();
+            sprite.spriteName = "ToggleBase";
+            sprite.size = new Vector2(16f, 16f);
+            sprite.relativePosition = new Vector3(2f, 2f);
+
+            checkBox.checkedBoxObject = sprite.AddUIComponent<UISprite>();
+            ((UISprite)checkBox.checkedBoxObject).spriteName = "ToggleBaseFocused";
+            checkBox.checkedBoxObject.size = new Vector2(16f, 16f);
+            checkBox.checkedBoxObject.relativePosition = Vector3.zero;
+
+            var building = BuildingManager.instance.m_buildings.m_buffer[BuildingID].Info.name;
+            checkBox.isChecked = fieldName == "Colorize" ? Colorizer.Colorized.Contains(building) : Colorizer.Inverted.Contains(building);
+            checkBox.tooltip = ReloadRequiredTooltip;
+            return checkBox;
+        }
+
         private void EventSelectedColorChangedHandler(UIComponent component, Color value)
         {
             UpdateColor(value, BuildingID);
@@ -150,13 +236,29 @@ namespace Painter
 
         private void EventColorPickerOpenHandler(UIColorField colorField, UIColorPicker colorPicker, ref bool overridden)
         {
-            colorPicker.component.height += 30f;
+            colorPicker.component.height += 60f;
+            colorizeCheckbox = CreateCheckBox(colorPicker.component, "Colorize");
+            invertCheckbox = CreateCheckBox(colorPicker.component, "Invert");
             copyButton = CreateButton(colorPicker.component, "Copy");
             pasteButton = CreateButton(colorPicker.component, "Paste");
             resetButton = CreateButton(colorPicker.component, "Reset");
             copyButton.relativePosition = new Vector3(10f, 223f);
             pasteButton.relativePosition = new Vector3(91.33333333333333f, 223f);
             resetButton.relativePosition = new Vector3(172.6666666666667f, 223f);
+            colorizeCheckbox.relativePosition = new Vector3(10f, 253f);
+            invertCheckbox.relativePosition = new Vector3(127f, 253f);
+            colorizeCheckbox.eventCheckChanged += (c, e) =>
+            {
+                ToggleCheckboxes(Colorizer.Colorized, e);
+                if(e) invertCheckbox.isChecked = !e;
+                Colorizer.Save();
+            };
+            invertCheckbox.eventCheckChanged += (c, e) =>
+            {
+                ToggleCheckboxes(Colorizer.Inverted, e);
+                if (e) colorizeCheckbox.isChecked = !e;
+                Colorizer.Save();
+            };
             copyButton.eventClick += (c, e) =>
             {
                 copyPasteColor = GetColor();
@@ -169,7 +271,13 @@ namespace Painter
             {
                 EraseColor();
             };
-        }        
+        }
+
+        private void ToggleCheckboxes(List<string> list, bool value)
+        {
+            if (value && !list.Contains(Building.name)) list.Add(Building.name);
+            if (!value && list.Contains(Building.name)) list.RemoveAll(building => building == Building.name);
+        }
     }
 
     public enum PanelType

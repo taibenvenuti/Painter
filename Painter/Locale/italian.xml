@@ -5,5 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Cancella" />
     <Translation ID="PAINTER-COPY" String="Copia" />
     <Translation ID="PAINTER-PASTE" String="Incolla" />
+    <Translation ID="PAINTER-COLORIZE" String="Colorizzare" />
+    <Translation ID="PAINTER-INVERT" String="Invertire" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="Quest'opzione necessita il riavvio del gioco." />
   </Translations>
 </Language>

@@ -7,7 +7,8 @@ namespace Painter
 {
     public class UserMod : IUserMod
     {
-        public string Name => "Painter";
+        public static string name = "Painter";
+        public string Name => name;
         public string Description => Translation.GetTranslation("PAINTER-DESCRIPTION");
         public static Translation Translation = new Translation();
         public void OnEnabled()
