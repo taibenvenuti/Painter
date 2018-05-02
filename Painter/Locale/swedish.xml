@@ -5,8 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Radera" />
     <Translation ID="PAINTER-COPY" String="Kopiera" />
     <Translation ID="PAINTER-PASTE" String="Klistra" />
-    <Translation ID="PAINTER-COLORIZE" String="Colorize" />
-    <Translation ID="PAINTER-INVERT" String="Invert" />
-    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-loading the save." />
+    <Translation ID="PAINTER-COLORIZE" String="Färga" />
+    <Translation ID="PAINTER-INVERT" String="Invertera" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="Detta alternativ kräver att spelet startas om." />
   </Translations>
 </Language>

@@ -137,7 +137,7 @@ namespace Painter
             {
                 Debug.LogWarning(ex);
             }
-        }     
+        }
 
         internal void AddColorFieldsToPanels()
         {
@@ -174,7 +174,7 @@ namespace Painter
             cF.size = new Vector2(26f, 26f);
             cF.pickerPosition = UIColorField.ColorPickerPosition.RightBelow;
             cF.eventSelectedColorChanged += EventSelectedColorChangedHandler;
-            cF.eventColorPickerOpen += EventColorPickerOpenHandler;            
+            cF.eventColorPickerOpen += EventColorPickerOpenHandler;
             return cF;
         }
 
@@ -195,7 +195,7 @@ namespace Painter
             button.disabledBgSprite = "ButtonMenuDisabled";
             button.hoveredBgSprite = "ButtonMenuHovered";
             button.focusedBgSprite = "ButtonMenu";
-            button.pressedBgSprite = "ButtonMenuPressed";            
+            button.pressedBgSprite = "ButtonMenuPressed";
             return button;
         }
 
@@ -236,9 +236,9 @@ namespace Painter
 
         private void EventColorPickerOpenHandler(UIColorField colorField, UIColorPicker colorPicker, ref bool overridden)
         {
-            colorPicker.component.height += 60f;
-            colorizeCheckbox = CreateCheckBox(colorPicker.component, "Colorize");
-            invertCheckbox = CreateCheckBox(colorPicker.component, "Invert");
+            colorPicker.component.height += Loading.IsHooked() ? 60f : 30f;
+            if(Loading.IsHooked()) colorizeCheckbox = CreateCheckBox(colorPicker.component, "Colorize");
+            if (Loading.IsHooked()) invertCheckbox = CreateCheckBox(colorPicker.component, "Invert");
             copyButton = CreateButton(colorPicker.component, "Copy");
             pasteButton = CreateButton(colorPicker.component, "Paste");
             resetButton = CreateButton(colorPicker.component, "Reset");
@@ -247,13 +247,13 @@ namespace Painter
             resetButton.relativePosition = new Vector3(172.6666666666667f, 223f);
             colorizeCheckbox.relativePosition = new Vector3(10f, 253f);
             invertCheckbox.relativePosition = new Vector3(127f, 253f);
-            colorizeCheckbox.eventCheckChanged += (c, e) =>
+            if (Loading.IsHooked()) colorizeCheckbox.eventCheckChanged += (c, e) =>
             {
                 ToggleCheckboxes(Colorizer.Colorized, e);
-                if(e) invertCheckbox.isChecked = !e;
+                if (e) invertCheckbox.isChecked = !e;
                 Colorizer.Save();
             };
-            invertCheckbox.eventCheckChanged += (c, e) =>
+            if (Loading.IsHooked()) invertCheckbox.eventCheckChanged += (c, e) =>
             {
                 ToggleCheckboxes(Colorizer.Inverted, e);
                 if (e) colorizeCheckbox.isChecked = !e;

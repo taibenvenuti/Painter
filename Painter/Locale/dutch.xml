@@ -5,8 +5,8 @@
     <Translation ID="PAINTER-RESET" String="Verwijderen" />
     <Translation ID="PAINTER-COPY" String="Kopiëren" />
     <Translation ID="PAINTER-PASTE" String="Plakken" />
-    <Translation ID="PAINTER-COLORIZE" String="Colorize" />
-    <Translation ID="PAINTER-INVERT" String="Invert" />
-    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-loading the save." />
+    <Translation ID="PAINTER-COLORIZE" String="Inkleuren" />
+    <Translation ID="PAINTER-INVERT" String="Omkeren" />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="Voor deze optie moet het spel opnieuw worden gestart." />
   </Translations>
 </Language>

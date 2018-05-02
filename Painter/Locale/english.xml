@@ -7,6 +7,6 @@
     <Translation ID="PAINTER-PASTE" String="Paste" />
     <Translation ID="PAINTER-COLORIZE" String="Colorize" />
     <Translation ID="PAINTER-INVERT" String="Invert" />
-    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-loading the save." />
+    <Translation ID="PAINTER-RELOAD-REQUIRED" String="This option requires re-starting the game." />
   </Translations>
 </Language>

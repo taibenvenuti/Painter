@@ -73,6 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hooking.cs" />
     <Compile Include="XMLSerializer.cs" />
     <Compile Include="TextureUtil.cs" />
     <Compile Include="ColorEntry.cs" />
